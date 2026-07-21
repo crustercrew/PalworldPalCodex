@@ -4,10 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.crustercrew.palworldpalcodex.enumerate.ElementType;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "pals")
@@ -22,12 +19,11 @@ public class Pal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "pal_number", nullable = false, unique = true)
+    @Column(name = "pal_number")
     private Integer palNumber;
 
     @Column(name = "name", nullable = false)
     private String name;
-
 
     @ElementCollection(targetClass = ElementType.class, fetch = FetchType.EAGER)
     @CollectionTable(
@@ -41,7 +37,7 @@ public class Pal {
     @Column(name = "alpha_title")
     private String alphaTitle;
 
-    @Column(name = "partner_skill")
+    @Column(name = "partner_skill", columnDefinition = "TEXT")
     private String partnerSkill;
 
     @Column(name = "food_consumption")
@@ -54,6 +50,7 @@ public class Pal {
     @Column(name = "breed_power")
     private Integer breedPower;
 
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     private String imageURL;
