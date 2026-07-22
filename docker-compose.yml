@@ -10,7 +10,7 @@ services:
     environment:
       POSTGRES_DB: palworld_db
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_PASSWORD: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -29,11 +29,12 @@ services:
       postgres-db:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/palworld_db?sslmode=prefer
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgrespassword
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_SHOW_SQL: "true"
+      DB_HOST: postgres-db
+      DB_PORT: 5432
+      DB_NAME: palworld_db
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_SCHEMA: public
 
 volumes:
   postgres_data:

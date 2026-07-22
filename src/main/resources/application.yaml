@@ -20,7 +20,23 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        default_schema: ${DB_SCHEMA:palworld}
+#        default_schema: ${DB_SCHEMA:palworld}
+        default_schema: ${DB_SCHEMA:public}
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+      data-locations:
+        - classpath:data/sql/01_element_types.sql
+        - classpath:data/sql/02_work_suitabilities.sql
+        - classpath:data/sql/03_items.sql
+        - classpath:data/sql/04_pals.sql
+        - classpath:data/sql/05_pal_stats.sql
+        - classpath:data/sql/06_pal_elements.sql
+        - classpath:data/sql/07_pal_loot_items.sql
+        - classpath:data/sql/08_active_skills.sql
+        - classpath:data/sql/09_pal_active_skills.sql
+        - classpath:data/sql/10_pal_work_suitabilities.sql
 
 server:
     port: 8080
