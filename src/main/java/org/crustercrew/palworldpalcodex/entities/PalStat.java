@@ -1,8 +1,8 @@
 package org.crustercrew.palworldpalcodex.entities;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
 
 @Entity
 @Table(name = "pal_stats")

@@ -2,8 +2,6 @@ package org.crustercrew.palworldpalcodex.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.crustercrew.palworldpalcodex.enumerate.ElementType;
-
 import java.util.*;
 
 @Entity
@@ -14,7 +12,6 @@ import java.util.*;
 @AllArgsConstructor
 @Builder
 public class Pal {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,14 +22,14 @@ public class Pal {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ElementCollection(targetClass = ElementType.class, fetch = FetchType.EAGER)
-    @CollectionTable(
-            name = "pal_element_types",
-            joinColumns = @JoinColumn(name = "pal_id")
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "pal_elements",
+            joinColumns = @JoinColumn(name = "pal_id"),
+            inverseJoinColumns = @JoinColumn(name = "element_id")
     )
-    @Enumerated(EnumType.STRING)
-    @Column(name = "element_type")
-    private Set<ElementType> elementType = new HashSet<>();
+    @Builder.Default
+    private Set<ElementType> elements = new HashSet<>();
 
     @Column(name = "alpha_title")
     private String alphaTitle;
@@ -65,7 +62,6 @@ public class Pal {
     @Builder.Default
     @OneToMany(mappedBy = "pal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PalLootItem> lootItems = new ArrayList<>();
-
     @Builder.Default
     @OneToMany(mappedBy = "pal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PalActiveSkill> activeSkills = new ArrayList<>();
@@ -75,6 +71,10 @@ public class Pal {
             stat.setPal(this);
         }
         this.stat = stat;
+    }
+
+    public void addElement(ElementType element) {
+        this.elements.add(element);
     }
 
     public void addWorkSuitability(PalWorkSuitability work) {
