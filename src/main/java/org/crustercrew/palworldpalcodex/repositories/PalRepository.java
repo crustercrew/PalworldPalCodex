@@ -69,4 +69,40 @@ public interface PalRepository extends JpaRepository<Pal, Long> {
         WHERE i.name ILIKE CONCAT('%', :itemName, '%')
         """, nativeQuery = true)
     Page<Pal> findPalsByLootItemName(@Param("itemName") String itemName,Pageable pageable);
+
+	@Query(value = """
+        SELECT DISTINCT p.* FROM pals p
+        INNER JOIN pal_elements pe ON p.id = pe.pal_id
+        INNER JOIN element_types et ON pe.element_id = et.id
+        WHERE et.name ILIKE :elementName
+        """,
+			countQuery = """
+        SELECT COUNT(DISTINCT p.id) FROM pals p
+        INNER JOIN pal_elements pe ON p.id = pe.pal_id
+        INNER JOIN element_types et ON pe.element_id = et.id
+        WHERE et.name ILIKE :elementName
+        """,
+			nativeQuery = true)
+	Page<Pal> findPalsByElementName(@Param("elementName") String elementName, Pageable pageable);
+
+	@Query(value = """
+        SELECT DISTINCT p.* FROM pals p
+        INNER JOIN pal_work_suitabilities pws ON p.id = pws.pal_id
+        INNER JOIN work_suitabilities ws ON pws.work_suitability_id = ws.id
+        WHERE ws.work_type ILIKE :workType
+          AND (CAST(:minLevel AS INTEGER) IS NULL OR pws.work_level >= CAST(:minLevel AS INTEGER))
+        """,
+			countQuery = """
+        SELECT COUNT(DISTINCT p.id) FROM pals p
+        INNER JOIN pal_work_suitabilities pws ON p.id = pws.pal_id
+        INNER JOIN work_suitabilities ws ON pws.work_suitability_id = ws.id
+        WHERE ws.work_type ILIKE :workType
+          AND (CAST(:minLevel AS INTEGER) IS NULL OR pws.work_level >= CAST(:minLevel AS INTEGER))
+        """,
+			nativeQuery = true)
+	Page<Pal> findPalsByWorkType(
+			@Param("workType") String workType,
+			@Param("minLevel") Integer minLevel,
+			Pageable pageable
+	);
 }

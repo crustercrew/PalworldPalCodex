@@ -1,6 +1,7 @@
 package org.crustercrew.palworldpalcodex.services;
 
 import lombok.RequiredArgsConstructor;
+import org.crustercrew.palworldpalcodex.dtos.PalResponseMapper;
 import org.crustercrew.palworldpalcodex.dtos.response.*;
 import org.crustercrew.palworldpalcodex.entities.ElementType;
 import org.crustercrew.palworldpalcodex.entities.Pal;
@@ -22,6 +23,7 @@ public class PalService {
 
     private final PalRepository palRepository;
     private final ElementTypeRepository elementTypeRepository;
+    private final PalResponseMapper palMapper = new PalResponseMapper();
 
     @Transactional(readOnly = true)
     public PageResponse<PalResponse> searchPalsNative(
@@ -34,7 +36,7 @@ public class PalService {
                 workType, minWorkLevel, elementType, minAttack, pageable
         );
 
-        Page<PalResponse> dtoPage = palPage.map(this::toSummary);
+        Page<PalResponse> dtoPage = palPage.map(palMapper::toSummary);
 
         return PageResponse.from(dtoPage);
     }
@@ -43,7 +45,7 @@ public class PalService {
     public PalDetailResponse getPalDetailByPalNumber(String palnumber){
         Pal palDetail = palRepository.findPalByPalNumber(palnumber)
                 .orElseThrow(() -> new RuntimeException("Pal not found"));
-        return toDetail(palDetail);
+        return palMapper.toDetail(palDetail);
     }
 
     @Transactional(readOnly = true)
@@ -61,7 +63,7 @@ public class PalService {
                             p2.getFoodConsumption() != null ? p2.getFoodConsumption() : 0
                     );
                 })
-                .map(this::toSummary)
+                .map(palMapper::toSummary)
                 .toList();
 
         return toPageResponse(fullList, pageable);
@@ -83,7 +85,7 @@ public class PalService {
                         pal.getElements().stream().anyMatch(e -> e.getId().equals(counterElement.getId())))
                 .sorted(Comparator.comparing((Pal p) -> p.getStat() != null && p.getStat().getAttack() != null ?
                         p.getStat().getAttack() : 0).reversed())
-                .map(this::toSummary)
+                .map(palMapper::toSummary)
                 .toList();
 
         return toPageResponse(fullList, pageable);
@@ -93,7 +95,7 @@ public class PalService {
         List<PalResponse> fullList = palRepository.findAll().stream()
                 .filter(pal -> pal.getStat() != null && pal.getStat().getAttack() != null)
                 .sorted(Comparator.comparing((Pal p) -> p.getStat().getAttack()).reversed())
-                .map(this::toSummary)
+                .map(palMapper::toSummary)
                 .toList();
 
         return toPageResponse(fullList, pageable);
@@ -102,7 +104,7 @@ public class PalService {
     @Transactional(readOnly = true)
     public PageResponse<PalResponse> getPalsByLootItem(String itemName, Pageable pageable) {
         Page<Pal> palPage = palRepository.findPalsByLootItemName(itemName, pageable);
-        return PageResponse.from(palPage.map(this::toSummary));
+        return PageResponse.from(palPage.map(palMapper::toSummary));
     }
 
 
@@ -125,104 +127,5 @@ public class PalService {
                 .orElse(0);
     }
 
-    // Convert Entity -> List DTO (Multiple Pal Response)
-    private PalResponse toSummary(Pal pal) {
-        if (pal == null) return null;
 
-        List<String> elements = pal.getElements() != null ?
-                pal.getElements().stream()
-                        .map(ElementType::getName)
-                        .toList() : Collections.emptyList();
-
-        List<PalWorkSuitabilityResponse> works = pal.getWorkSuitabilities() != null ?
-                pal.getWorkSuitabilities().stream()
-                        .map(pws -> new PalWorkSuitabilityResponse(
-                                pws.getWorkSuitability().getWorkType(),
-                                pws.getWorkLevel(),
-                                pws.getWorkSuitability().getIconUrl()
-                        )).toList() : Collections.emptyList();
-
-        return new PalResponse(
-                pal.getId(),
-                pal.getPalNumber(),
-                pal.getName(),
-                elements,
-                pal.getAlphaTitle(),
-                pal.getPartnerSkill(),
-                pal.getFoodConsumption(),
-                pal.getImageURL(),
-                works
-        );
-    }
-
-    // Convert Entity -> Detail DTO (Single or detail Pal Response)
-    private PalDetailResponse toDetail(Pal pal) {
-        if (pal == null) return null;
-
-        List<ElementTypeResponse> elements = pal.getElements() != null ?
-                pal.getElements().stream()
-                        .map(e -> new ElementTypeResponse(e.getId(), e.getName(), e.getIconUrl()))
-                        .toList() : Collections.emptyList();
-
-        PalStatsResponse statDto = pal.getStat() != null ?
-                new PalStatsResponse(
-                        pal.getStat().getHp(),
-                        pal.getStat().getAttack(),
-                        pal.getStat().getDefense(),
-                        pal.getStat().getMinHp(),
-                        pal.getStat().getMaxHp(),
-                        pal.getStat().getMinAttack(),
-                        pal.getStat().getMaxAttack(),
-                        pal.getStat().getMinDefense(),
-                        pal.getStat().getMaxDefense()
-                ) : null;
-
-        List<PalWorkSuitabilityResponse> works = pal.getWorkSuitabilities() != null ?
-                pal.getWorkSuitabilities().stream()
-                        .map(pws -> new PalWorkSuitabilityResponse(
-                                pws.getWorkSuitability().getWorkType(),
-                                pws.getWorkLevel(),
-                                pws.getWorkSuitability().getIconUrl()
-                        )).toList() : Collections.emptyList();
-
-        List<PalLootItemResponse> loots = pal.getLootItems() != null ?
-                pal.getLootItems().stream()
-                        .map(pli -> new PalLootItemResponse(
-                                pli.getItem().getName(),
-                                pli.getItem().getCategory(),
-                                pli.getDropTotal(),
-                                pli.getDropRate(),
-                                pli.getItem().getIconUrl()
-                        )).toList() : Collections.emptyList();
-
-        List<PalActiveSkillsResponse> skills = pal.getActiveSkills() != null ?
-                pal.getActiveSkills().stream()
-                        .map(pas -> new PalActiveSkillsResponse(
-                                pas.getActiveSkill().getName(),
-                                pas.getActiveSkill().getElement() != null ? pas.getActiveSkill().getElement().getName() : null,
-                                pas.getActiveSkill().getPower(),
-                                pas.getActiveSkill().getCooldownSeconds(),
-                                pas.getUnlockLevel(),
-                                pas.getActiveSkill().getDescription()
-                        )).toList() : Collections.emptyList();
-
-        return new PalDetailResponse(
-                pal.getId(),
-                pal.getPalNumber(),
-                pal.getName(),
-                elements,
-                pal.getAlphaTitle(),
-                pal.getPartnerSkill(),
-                pal.getFoodConsumption(),
-                pal.getEggName(),
-                pal.getEggSize(),
-                pal.getBreedPower(),
-                pal.getDescription(),
-                pal.getImageURL(),
-                statDto,
-                works,
-                loots,
-                skills
-        );
-    }
 }
