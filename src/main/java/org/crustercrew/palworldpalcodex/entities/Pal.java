@@ -16,8 +16,8 @@ public class Pal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "pal_number")
-    private Integer palNumber;
+    @Column(name = "pal_number", length = 5)
+    private String palNumber;
 
     @Column(name = "name", nullable = false)
     private String name;

@@ -4,6 +4,7 @@
 
 TRUNCATE TABLE pal_active_skills RESTART IDENTITY CASCADE;
 
+INSERT INTO pal_active_skills (pal_id, active_skill_id, unlock_level) VALUES (5, 169, 1) ON CONFLICT (pal_id, active_skill_id) DO NOTHING;
 INSERT INTO pal_active_skills (pal_id, active_skill_id, unlock_level) VALUES (5, 45, 7) ON CONFLICT (pal_id, active_skill_id) DO NOTHING;
 INSERT INTO pal_active_skills (pal_id, active_skill_id, unlock_level) VALUES (5, 2, 15) ON CONFLICT (pal_id, active_skill_id) DO NOTHING;
 INSERT INTO pal_active_skills (pal_id, active_skill_id, unlock_level) VALUES (5, 73, 22) ON CONFLICT (pal_id, active_skill_id) DO NOTHING;

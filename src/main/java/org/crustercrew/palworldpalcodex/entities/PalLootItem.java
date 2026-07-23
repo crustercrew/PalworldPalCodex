@@ -33,8 +33,8 @@ public class PalLootItem {
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
-    @Column(name = "size")
-    private String size;
+    @Column(name = "drop_total")
+    private String dropTotal;
 
     @Column(name = "drop_rate")
     private Double dropRate;
