@@ -9,6 +9,7 @@ import org.crustercrew.palworldpalcodex.dtos.response.PalResponse;
 import org.crustercrew.palworldpalcodex.entities.Pal;
 import org.crustercrew.palworldpalcodex.repositories.ElementTypeRepository;
 import org.crustercrew.palworldpalcodex.repositories.PalRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class ElementService {
     private final PalResponseMapper palMapper = new PalResponseMapper();
 
     // 1. Get Master List Elemen
+    @Cacheable(value = "element_types",key = "'all'")
     @Transactional(readOnly = true)
     public List<ElementTypeResponse> getAllElements() {
         return elementTypeRepository.findAll().stream()
@@ -38,6 +40,7 @@ public class ElementService {
     }
 
     // 2. Get Pals by Element Name (Terpaginasi)
+    @Cacheable(value = "pals_by_element",key = "#elementName")
     @Transactional(readOnly = true)
     public PageResponse<PalResponse> getPalsByElement(String elementName, Pageable pageable) {
         Page<Pal> palPage = palRepository.findPalsByElementName(elementName, pageable);

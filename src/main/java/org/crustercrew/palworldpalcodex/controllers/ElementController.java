@@ -6,7 +6,10 @@ import org.crustercrew.palworldpalcodex.dtos.response.ElementTypeResponse;
 import org.crustercrew.palworldpalcodex.dtos.response.PageResponse;
 import org.crustercrew.palworldpalcodex.dtos.response.PalResponse;
 import org.crustercrew.palworldpalcodex.services.ElementService;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,8 +35,8 @@ public class ElementController {
     @GetMapping("/{elementName}/pals")
     public ResponseEntity<APIResponse<PageResponse<PalResponse>>> getPalsByElement(
             @PathVariable String elementName,
-            Pageable pageable) {
-
+            @ParameterObject @PageableDefault(page = 0, size = 10,sort="id",direction = Sort.Direction.ASC) Pageable pageable
+    ) {
         PageResponse<PalResponse> result = elementService.getPalsByElement(elementName, pageable);
         return ResponseEntity.ok(APIResponse.success("Pals fetched for element: " + elementName, result));
     }

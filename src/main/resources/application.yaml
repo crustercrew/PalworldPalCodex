@@ -19,7 +19,6 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
-    show-sql: true
     properties:
       hibernate:
         format_sql: true
@@ -28,11 +27,20 @@ spring:
     init:
       mode: embedded
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  cache:
+    type: caffeine
+    redis:
+      time-to-live: 3600000
+
 server:
     port: 8080
 
 logging:
     level:
       org.hibernate.orm.core: ERROR
-      org.hibernate.SQL: DEBUG
-      org.springframework.web: INFO
+      org.hibernate.SQL: error
+      org.springframework.web: warn

@@ -7,6 +7,7 @@ import org.crustercrew.palworldpalcodex.entities.ElementType;
 import org.crustercrew.palworldpalcodex.entities.Pal;
 import org.crustercrew.palworldpalcodex.repositories.ElementTypeRepository;
 import org.crustercrew.palworldpalcodex.repositories.PalRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,7 @@ public class PalService {
     private final ElementTypeRepository elementTypeRepository;
     private final PalResponseMapper palMapper = new PalResponseMapper();
 
+    @Cacheable(value = "pals",key = "'all'")
     @Transactional(readOnly = true)
     public PageResponse<PalResponse> searchPalsNative(
             String name, String palNumber, Integer foodConsumption, String alphaTitle,
@@ -41,6 +43,7 @@ public class PalService {
         return PageResponse.from(dtoPage);
     }
 
+    @Cacheable(value = "pal_detail",key = "#palnumber")
     @Transactional(readOnly = true)
     public PalDetailResponse getPalDetailByPalNumber(String palnumber){
         Pal palDetail = palRepository.findPalByPalNumber(palnumber)
@@ -48,6 +51,7 @@ public class PalService {
         return palMapper.toDetail(palDetail);
     }
 
+    @Cacheable(value = "base_workers",key = "#workType")
     @Transactional(readOnly = true)
     public PageResponse<PalResponse> getBaseWorkerRecommendations(String workType, Pageable pageable) {
         List<PalResponse> fullList = palRepository.findAll().stream()
@@ -69,6 +73,7 @@ public class PalService {
         return toPageResponse(fullList, pageable);
     }
 
+    @Cacheable(value = "counter_pals",key = "#targetElementName")
     @Transactional(readOnly = true)
     public PageResponse<PalResponse> getCounterPals(String targetElementName, Pageable pageable) {
         ElementType targetElement = elementTypeRepository.findByNameIgnoreCase(targetElementName)
@@ -90,6 +95,8 @@ public class PalService {
 
         return toPageResponse(fullList, pageable);
     }
+
+    @Cacheable(value = "top_attackers",key = "'all'")
     @Transactional(readOnly = true)
     public PageResponse<PalResponse> getTopAttackers(Pageable pageable) {
         List<PalResponse> fullList = palRepository.findAll().stream()
@@ -101,6 +108,7 @@ public class PalService {
         return toPageResponse(fullList, pageable);
     }
 
+    @Cacheable(value = "pals_by_loot_item",key = "#itemName")
     @Transactional(readOnly = true)
     public PageResponse<PalResponse> getPalsByLootItem(String itemName, Pageable pageable) {
         Page<Pal> palPage = palRepository.findPalsByLootItemName(itemName, pageable);
@@ -126,6 +134,4 @@ public class PalService {
                 .findFirst()
                 .orElse(0);
     }
-
-
 }

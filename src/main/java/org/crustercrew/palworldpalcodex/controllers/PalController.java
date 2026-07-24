@@ -6,7 +6,10 @@ import org.crustercrew.palworldpalcodex.dtos.response.PageResponse;
 import org.crustercrew.palworldpalcodex.dtos.response.PalDetailResponse;
 import org.crustercrew.palworldpalcodex.dtos.response.PalResponse;
 import org.crustercrew.palworldpalcodex.services.PalService;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +30,8 @@ public class PalController {
             @RequestParam(required = false) Integer minWorkLevel,
             @RequestParam(required = false) String elementType,
             @RequestParam(required = false) Integer minAttack,
-            Pageable pageable) {
+            @ParameterObject @PageableDefault(page = 0, size = 10,sort="id",direction = Sort.Direction.ASC) Pageable pageable
+    ) {
 
         PageResponse<PalResponse> result = palService.searchPalsNative(
                 name, palNumber, foodConsumption, alphaTitle, partnerSkill,
@@ -46,7 +50,8 @@ public class PalController {
     @GetMapping("/recommendations/base-workers")
     public ResponseEntity<APIResponse<PageResponse<PalResponse>>> getBaseWorkers(
             @RequestParam String workType,
-            Pageable pageable) {
+            @ParameterObject @PageableDefault(page = 0, size = 10,sort="id",direction = Sort.Direction.ASC) Pageable pageable
+    ) {
 
         PageResponse<PalResponse> result = palService.getBaseWorkerRecommendations(workType, pageable);
         return ResponseEntity.ok(APIResponse.success("Base workers recommendations for " + workType, result));
@@ -55,14 +60,17 @@ public class PalController {
     @GetMapping("/recommendations/counters")
     public ResponseEntity<APIResponse<PageResponse<PalResponse>>> getCounters(
             @RequestParam String targetElement,
-            Pageable pageable) {
+            @ParameterObject @PageableDefault(page = 0, size = 10,sort="id",direction = Sort.Direction.ASC) Pageable pageable
+    ) {
 
         PageResponse<PalResponse> result = palService.getCounterPals(targetElement, pageable);
         return ResponseEntity.ok(APIResponse.success("Counter pals for " + targetElement, result));
     }
 
     @GetMapping("/stats/top-attackers")
-    public ResponseEntity<APIResponse<PageResponse<PalResponse>>> getTopAttackers(Pageable pageable) {
+    public ResponseEntity<APIResponse<PageResponse<PalResponse>>> getTopAttackers(
+            @ParameterObject @PageableDefault(page = 0, size = 10,sort="id",direction = Sort.Direction.ASC) Pageable pageable
+    ) {
         PageResponse<PalResponse> result = palService.getTopAttackers(pageable);
         return ResponseEntity.ok(APIResponse.success("Top attackers retrieved", result));
     }
@@ -70,7 +78,8 @@ public class PalController {
     @GetMapping("/loots/search")
     public ResponseEntity<APIResponse<PageResponse<PalResponse>>> getPalsByLoot(
             @RequestParam String itemName,
-            Pageable pageable) {
+            @ParameterObject @PageableDefault(page = 0, size = 10,sort="id",direction = Sort.Direction.ASC) Pageable pageable
+            ) {
 
         PageResponse<PalResponse> result = palService.getPalsByLootItem(itemName, pageable);
         return ResponseEntity.ok(APIResponse.success("Pals dropping " + itemName, result));

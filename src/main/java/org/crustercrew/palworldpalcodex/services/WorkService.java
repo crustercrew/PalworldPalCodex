@@ -8,6 +8,7 @@ import org.crustercrew.palworldpalcodex.dtos.response.WorkSuitabilityResponse;
 import org.crustercrew.palworldpalcodex.entities.Pal;
 import org.crustercrew.palworldpalcodex.repositories.PalRepository;
 import org.crustercrew.palworldpalcodex.repositories.WorkSuitabilityRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class WorkService {
     private final PalResponseMapper palMapper;
 
     // 1. Get Master List Pekerjaan Base
+    @Cacheable(value = "work_suitabilities",key = "'all'")
     @Transactional(readOnly = true)
     public List<WorkSuitabilityResponse> getAllWorks() {
         return workSuitabilityRepository.findAll().stream()
@@ -35,7 +37,8 @@ public class WorkService {
                 .toList();
     }
 
-    // 2. Get Pals by Work Type & Min Work Level (Terpaginasi)
+    // 2. Get Pals by Work Type & Min Work Level
+    @Cacheable(value = "pals_by_work",key = "#workType+'_'+#minLevel")
     @Transactional(readOnly = true)
     public PageResponse<PalResponse> getPalsByWork(String workType, Integer minLevel, Pageable pageable) {
         Page<Pal> palPage = palRepository.findPalsByWorkType(workType, minLevel, pageable);
