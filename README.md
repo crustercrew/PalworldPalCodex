@@ -45,6 +45,7 @@ cd PalworldPalCodex
 docker-compose up -d --build
 ```
 The API will be available at http://localhost:8080.
+Interactive OpenAPI Sandbox Testing UI: http://localhost:8080/swagger-ui/index.html
 
 ## 📌 API Endpoints Overview
 
